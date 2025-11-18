@@ -70,14 +70,6 @@ If you use a `MCEmojiPicker`, add your application via Pull Request. Fore more i
 
 ## Installation
 
-### CocoaPods
-
-[CocoaPods](https://cocoapods.org) is a dependency manager for Cocoa projects. For usage and installation instructions, visit their website. To integrate `MCEmojiPicker` into your Xcode project using CocoaPods, specify it in your `Podfile`:
-
-```ruby
-pod 'MCEmojiPicker'
-```
-
 ### Swift Package Manager
 
 The [Swift Package Manager](https://swift.org/package-manager/) is a tool for managing the distribution of Swift code. It’s integrated with the Swift build system to automate the process of downloading, compiling, and linking dependencies.
@@ -85,7 +77,7 @@ The [Swift Package Manager](https://swift.org/package-manager/) is a tool for ma
 To integrate `MCEmojiPicker` into your Xcode project using Xcode 11, specify it in `Project > Swift Packages`:
 
 ```ogdl
-https://github.com/izyumkin/MCEmojiPicker
+https://github.com/jeanno/MCEmojiPicker
 ```
 
 ### Manually
