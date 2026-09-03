@@ -70,6 +70,16 @@ public struct MCEmoji: Codable {
         getEmoji()
     }
 
+    /// This emoji in every skin tone it supports, the default one first.
+    ///
+    /// Each variant is fixed to its own skin tone, so it is displayed and selected as that
+    /// variant no matter which skin tone has been stored for the emoji, and offers no skin
+    /// tone choice of its own. An emoji without skin tone support is its own only variant.
+    public var variants: [MCEmoji] {
+        guard isSkinToneSupport else { return [self] }
+        return MCEmojiSkinTone.allCases.map({ variant(with: $0) })
+    }
+
     /// The keys used to represent the emoji.
     private(set) public var emojiKeys: [Int]
     /// A boolean indicating whether this emoji has different skin tones available.
@@ -78,6 +88,14 @@ public struct MCEmoji: Codable {
     private(set) public var searchKey: String
     /// The emoji version.
     private(set) public var version: Double
+    
+    // MARK: - Private Properties
+    
+    /// The skin tone this instance is fixed to, if it represents one specific variant of an emoji.
+    ///
+    /// Set for the emojis returned by ``variants``, `nil` for every emoji coming from the
+    /// emoji definitions, which follow the skin tone selected by the user instead.
+    private var fixedSkinTone: MCEmojiSkinTone?
     
     // MARK: - Initializers
     
@@ -110,6 +128,20 @@ public struct MCEmoji: Codable {
         UserDefaults.standard.set(skinToneRawValue, forKey: StorageKeys.skinTone(self).key)
     }
     
+    /// Returns this emoji fixed to the target skin tone.
+    ///
+    /// The returned emoji is displayed and selected in that skin tone no matter which skin
+    /// tone has been stored for the emoji, and offers no skin tone choice of its own.
+    
+    /// - Parameters:
+    ///   - skinTone: The skin tone to fix the emoji to.
+    public func variant(with skinTone: MCEmojiSkinTone) -> MCEmoji {
+        var variant = self
+        variant.fixedSkinTone = skinTone
+        variant.isSkinToneSupport = false
+        return variant
+    }
+    
     /// Increments the usage count for this emoji.
     public func incrementUsageCount() {
         let nowTimestamp = Date().timeIntervalSince1970
@@ -120,12 +152,27 @@ public struct MCEmoji: Codable {
     
     /// Returns the string representation of this smiley. Considering the skin tone, if it has been selected.
     private func getEmoji() -> String {
-        guard isSkinToneSupport,
-              let skinTone = skinTone,
-              let skinToneKey = skinTone.skinKey else {
+        if let fixedSkinTone = fixedSkinTone {
+            return getEmoji(with: fixedSkinTone)
+        }
+        guard isSkinToneSupport else { return emojiKeys.emoji() }
+        return getEmoji(with: skinTone)
+    }
+    
+    /// Returns the string representation of this smiley in the target skin tone.
+    
+    /// - Parameters:
+    ///   - skinTone: The skin tone to apply. Without it, the default representation is returned.
+    private func getEmoji(with skinTone: MCEmojiSkinTone?) -> String {
+        guard let skinToneKey = skinTone?.skinKey else {
             return emojiKeys.emoji()
         }
         var bufferEmojiKeys = emojiKeys
+        // The emoji presentation selector is dropped, since the skin tone modifier
+        // following the base key already makes the presentation an emoji one.
+        if bufferEmojiKeys.count > 1, bufferEmojiKeys[1] == 0xFE0F {
+            bufferEmojiKeys.remove(at: 1)
+        }
         bufferEmojiKeys.insert(skinToneKey, at: 1)
         return bufferEmojiKeys.emoji()
     }
@@ -133,7 +180,7 @@ public struct MCEmoji: Codable {
 
 /// This enumeration allows you to determine which skin tones can be set for `MCEmoji`.
 @_spi(JSON)
-public enum MCEmojiSkinTone: Int, CaseIterable {
+public enum MCEmojiSkinTone: Int, CaseIterable, Codable {
     case none = 1
     case light = 2
     case mediumLight = 3

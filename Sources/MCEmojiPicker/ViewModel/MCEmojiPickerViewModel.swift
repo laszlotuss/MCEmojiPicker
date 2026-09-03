@@ -136,12 +136,29 @@ final class MCEmojiPickerViewModel: MCEmojiPickerViewModelProtocol {
     
     private func filterCategoriesBySearchText(_ categories: [MCEmojiCategory], searchText: String) -> [MCEmojiCategory] {
         let lowercasedSearchText = searchText.lowercased()
+        // Skin tone modifiers and presentation selectors are dropped from the searched emojis,
+        // so that any variant of an emoji finds that emoji.
+        let searchedEmojis = Set(
+            searchText.containedEmojis
+                .map({ $0.withoutEmojiVariants })
+                .filter({ !$0.isEmpty })
+        )
         
         return categories.compactMap { category in
-            let filteredEmojis = category.emojis.filter { $0.searchKey.lowercased().contains(lowercasedSearchText) }
+            let filteredEmojis = category.emojis.filter { emoji in
+                if !searchedEmojis.isEmpty,
+                   searchedEmojis.contains(emoji.emojiKeys.emoji().withoutEmojiVariants) {
+                    return true
+                }
+                return emoji.searchKey.lowercased().contains(lowercasedSearchText)
+            }
             guard !filteredEmojis.isEmpty else { return nil }
             var filteredCategory = category
-            filteredCategory.emojis = filteredEmojis
+            // When an emoji is being searched for, every skin tone variant of the found
+            // emojis is offered separately, since the searched emoji may be one of them.
+            filteredCategory.emojis = searchedEmojis.isEmpty
+                ? filteredEmojis
+                : filteredEmojis.flatMap({ $0.variants })
             return filteredCategory
         }
     }
