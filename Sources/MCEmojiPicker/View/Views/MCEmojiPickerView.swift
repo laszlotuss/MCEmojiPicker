@@ -71,6 +71,9 @@ final class MCEmojiPickerView: UIView {
         )
     }
     
+    /// Whether the search bar shows above the emojis. It's read once, when the picker is first laid out.
+    var displaysSearchBar = true
+    
     // MARK: - Private Properties
     
     private let emojiCategoryTypes: [MCEmojiCategoryType]
@@ -183,13 +186,16 @@ final class MCEmojiPickerView: UIView {
         collectionView.verticalScrollIndicatorInsets.bottom = categoriesStackViewHeight
     }
     
+    /// Without the search bar, it collapses so the emojis start at the top.
     private func setupSearchBarLayout() {
         addSubview(searchBar)
+        searchBar.isHidden = !displaysSearchBar
+        let topPadding = displaysSearchBar ? Constants.searchBarTopPadding : 0
         NSLayoutConstraint.activate([
             searchBar.leadingAnchor.constraint(equalTo: leadingAnchor),
             searchBar.trailingAnchor.constraint(equalTo: trailingAnchor),
-            searchBar.topAnchor.constraint(equalTo: topAnchor, constant: safeAreaInsets.top + Constants.searchBarTopPadding),
-            searchBar.heightAnchor.constraint(equalToConstant: Constants.searchBarHeight)
+            searchBar.topAnchor.constraint(equalTo: topAnchor, constant: safeAreaInsets.top + topPadding),
+            searchBar.heightAnchor.constraint(equalToConstant: displaysSearchBar ? Constants.searchBarHeight : 0)
         ])
     }
     

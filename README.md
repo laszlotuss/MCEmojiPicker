@@ -136,6 +136,13 @@ Defines whether to dismiss emoji picker or not after choosing. The default value
 viewController.isDismissAfterChoosing = true
 ```
 
+### Displays search bar
+Defines whether the search bar shows above the emojis. The default value of this property is `true`.
+
+```swift
+viewController.displaysSearchBar = false
+```
+
 ### Custom height
 Custom height for EmojiPicker. The default value of this property is `nil`.
 
@@ -174,7 +181,8 @@ MCEmojiPickerRepresentableController(
     horizontalInset: .zero,
     isDismissAfterChoosing: true,
     selectedEmojiCategoryTintColor: .systemBlue,
-    feedBackGeneratorStyle: .light
+    feedBackGeneratorStyle: .light,
+    displaysSearchBar: true
 )
 ```
 

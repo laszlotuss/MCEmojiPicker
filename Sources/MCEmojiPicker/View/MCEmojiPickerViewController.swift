@@ -56,6 +56,16 @@ public final class MCEmojiPickerViewController: UIViewController {
     /// The default value of this property is `true`.
     public var isDismissAfterChoosing: Bool = true
     
+    /// A boolean value that determines whether the search bar shows above the emojis.
+    ///
+    /// Set it before the EmojiPicker is presented.
+    /// The default value of this property is `true`.
+    public var displaysSearchBar: Bool = true {
+        didSet {
+            emojiPickerView.displaysSearchBar = displaysSearchBar
+        }
+    }
+    
     /// Color for the selected emoji category.
     ///
     /// The default value of this property is `.systemBlue`.

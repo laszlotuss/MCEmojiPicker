@@ -59,6 +59,11 @@ public struct MCEmojiPickerRepresentableController: UIViewControllerRepresentabl
     /// The default value of this property is `true`.
     public var isDismissAfterChoosing: Bool?
     
+    /// A boolean value that determines whether the search bar shows above the emojis.
+    ///
+    /// The default value of this property is `true`.
+    public var displaysSearchBar: Bool?
+    
     /// Color for the selected emoji category.
     ///
     /// The default value of this property is `.systemBlue`.
@@ -79,7 +84,8 @@ public struct MCEmojiPickerRepresentableController: UIViewControllerRepresentabl
         horizontalInset: CGFloat? = nil,
         isDismissAfterChoosing: Bool? = nil,
         selectedEmojiCategoryTintColor: UIColor? = nil,
-        feedBackGeneratorStyle: UIImpactFeedbackGenerator.FeedbackStyle? = nil
+        feedBackGeneratorStyle: UIImpactFeedbackGenerator.FeedbackStyle? = nil,
+        displaysSearchBar: Bool? = nil
     ) {
         self._isPresented = isPresented
         self._selectedEmoji = selectedEmoji
@@ -89,6 +95,7 @@ public struct MCEmojiPickerRepresentableController: UIViewControllerRepresentabl
         self.isDismissAfterChoosing = isDismissAfterChoosing
         self.selectedEmojiCategoryTintColor = selectedEmojiCategoryTintColor
         self.feedBackGeneratorStyle = feedBackGeneratorStyle
+        self.displaysSearchBar = displaysSearchBar
     }
     
     // MARK: - Public Methods
@@ -116,6 +123,7 @@ public struct MCEmojiPickerRepresentableController: UIViewControllerRepresentabl
             if let customHeight { emojiPicker.customHeight = customHeight }
             if let horizontalInset { emojiPicker.horizontalInset = horizontalInset }
             if let isDismissAfterChoosing { emojiPicker.isDismissAfterChoosing = isDismissAfterChoosing }
+            if let displaysSearchBar { emojiPicker.displaysSearchBar = displaysSearchBar }
             if let selectedEmojiCategoryTintColor {
                 emojiPicker.selectedEmojiCategoryTintColor = selectedEmojiCategoryTintColor
             }
