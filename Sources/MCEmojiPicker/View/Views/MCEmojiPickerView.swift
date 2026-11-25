@@ -63,6 +63,8 @@ final class MCEmojiPickerView: UIView {
         static let collectionViewHeaderHeight = 40.0
         
         static let categoriesStackViewInsets = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: -16)
+        /// On Liquid Glass the category bar floats in a capsule, off the bottom edge.
+        static let glassCategoriesBarBottomInset = 8.0
         
         static let separatorHeight = 0.8
         static let separatorColor = UIColor(
@@ -151,6 +153,7 @@ final class MCEmojiPickerView: UIView {
         setupCollectionViewLayout()
         setupCollectionViewBottomInsets()
         setupCategoriesControlLayout()
+        setupLiquidGlass()
     }
     
     // MARK: - Public Methods
@@ -172,7 +175,7 @@ final class MCEmojiPickerView: UIView {
     // MARK: - Private Methods
     
     private func setupBackgroundColor() {
-        backgroundColor = .popoverBackgroundColor
+        backgroundColor = MCLiquidGlass.isAvailable ? .clear : .popoverBackgroundColor
     }
     
     private func setupDelegates() {
@@ -182,8 +185,13 @@ final class MCEmojiPickerView: UIView {
     }
     
     private func setupCollectionViewBottomInsets() {
-        collectionView.contentInset.bottom = categoriesStackViewHeight
-        collectionView.verticalScrollIndicatorInsets.bottom = categoriesStackViewHeight
+        let bottomInset = categoriesStackViewHeight + categoriesBarBottomInset
+        collectionView.contentInset.bottom = bottomInset
+        collectionView.verticalScrollIndicatorInsets.bottom = bottomInset
+    }
+    
+    private var categoriesBarBottomInset: CGFloat {
+        MCLiquidGlass.isAvailable ? Constants.glassCategoriesBarBottomInset : 0
     }
     
     /// Without the search bar, it collapses so the emojis start at the top.
@@ -213,6 +221,11 @@ final class MCEmojiPickerView: UIView {
         let separatorView = UIView()
         separatorView.translatesAutoresizingMaskIntoConstraints = false
         separatorView.backgroundColor = Constants.separatorColor
+        // On Liquid Glass the emojis fade out under the bar instead.
+        separatorView.isHidden = MCLiquidGlass.isAvailable
+        if MCLiquidGlass.isAvailable {
+            categoriesStackView.backgroundColor = .clear
+        }
         
         addSubview(categoriesStackView)
         addSubview(separatorView)
@@ -228,7 +241,7 @@ final class MCEmojiPickerView: UIView {
             ),
             categoriesStackView.bottomAnchor.constraint(
                 equalTo: bottomAnchor,
-                constant: -safeAreaInsets.bottom
+                constant: -safeAreaInsets.bottom - categoriesBarBottomInset
             ),
             categoriesStackView.heightAnchor.constraint(
                 equalToConstant: categoriesStackViewHeight
@@ -239,6 +252,34 @@ final class MCEmojiPickerView: UIView {
             separatorView.topAnchor.constraint(equalTo: categoriesStackView.topAnchor),
             separatorView.heightAnchor.constraint(equalToConstant: Constants.separatorHeight)
         ])
+    }
+    
+    /// On Liquid Glass, section titles scroll with the emojis rather than pinning over them without a background, and the
+    /// category bar floats in a glass capsule, with the emojis fading out under it like under a tab bar.
+    private func setupLiquidGlass() {
+#if compiler(>=6.2)
+        guard #available(iOS 26, *) else { return }
+        (collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?.sectionHeadersPinToVisibleBounds = false
+        
+        let glassView = UIVisualEffectView(effect: UIGlassEffect())
+        glassView.translatesAutoresizingMaskIntoConstraints = false
+        glassView.cornerConfiguration = .capsule()
+        glassView.isUserInteractionEnabled = false
+        categoriesStackView.insertSubview(glassView, at: 0)
+        NSLayoutConstraint.activate([
+            glassView.leadingAnchor.constraint(equalTo: categoriesStackView.leadingAnchor),
+            glassView.trailingAnchor.constraint(equalTo: categoriesStackView.trailingAnchor),
+            glassView.topAnchor.constraint(equalTo: categoriesStackView.topAnchor),
+            glassView.bottomAnchor.constraint(equalTo: categoriesStackView.bottomAnchor)
+        ])
+        
+        // The edge effect takes its shape from glass, labels and controls; the drawn category icons alone don't count.
+        collectionView.bottomEdgeEffect.style = .soft
+        let edgeInteraction = UIScrollEdgeElementContainerInteraction()
+        edgeInteraction.scrollView = collectionView
+        edgeInteraction.edge = .bottom
+        categoriesStackView.addInteraction(edgeInteraction)
+#endif
     }
     
     private func setupCategoryViews() {

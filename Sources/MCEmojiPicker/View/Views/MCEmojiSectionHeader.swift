@@ -65,7 +65,7 @@ final class MCEmojiSectionHeader: UICollectionReusableView {
     // MARK: - Private Methods
     
     private func setupBackgroundColor() {
-        backgroundColor = Constants.backgroundColor
+        backgroundColor = MCLiquidGlass.isAvailable ? .clear : Constants.backgroundColor
     }
     
     private func setupHeaderLabelLayout() {
