@@ -143,6 +143,13 @@ Defines whether the search bar shows above the emojis. The default value of this
 viewController.displaysSearchBar = false
 ```
 
+### Storage
+Where pickers keep each emoji's chosen skin tone and usage, which makes up Frequently Used. Set it before a picker is created, for example to an App Group's defaults so several apps share their history. The first time an app moves off the standard defaults, its history there is merged into the new ones. The default value of this property is `.standard`.
+
+```swift
+MCEmojiPickerViewController.storage = UserDefaults(suiteName: "group.com.example.emoji")!
+```
+
 ### Custom height
 Custom height for EmojiPicker. The default value of this property is `nil`.
 
@@ -182,7 +189,8 @@ MCEmojiPickerRepresentableController(
     isDismissAfterChoosing: true,
     selectedEmojiCategoryTintColor: .systemBlue,
     feedBackGeneratorStyle: .light,
-    displaysSearchBar: true
+    displaysSearchBar: true,
+    storage: UserDefaults(suiteName: "group.com.example.emoji")
 )
 ```
 

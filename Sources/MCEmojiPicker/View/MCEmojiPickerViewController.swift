@@ -30,6 +30,17 @@ public final class MCEmojiPickerViewController: UIViewController {
     
     // MARK: - Public Properties
     
+    /// Where pickers keep each emoji's chosen skin tone and how often it's picked, which makes up Frequently Used.
+    ///
+    /// Set it before a picker is created, for example to an App Group's defaults so several apps share their history:
+    /// `MCEmojiPickerViewController.storage = UserDefaults(suiteName: "group.com.example.emoji")!`.
+    /// The first time an app moves off the standard defaults, its history there is merged into the new ones.
+    /// The default value of this property is `.standard`.
+    public static var storage: UserDefaults {
+        get { MCEmojiStorage.defaults }
+        set { MCEmojiStorage.use(newValue) }
+    }
+    
     /// Delegate for selecting an emoji object.
     public weak var delegate: MCEmojiPickerDelegate?
     

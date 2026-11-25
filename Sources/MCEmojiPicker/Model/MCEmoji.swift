@@ -28,7 +28,7 @@ public struct MCEmoji: Codable {
     // MARK: - Types
     
     /// Keys for storage in UserDefaults.
-    private enum StorageKeys {
+    enum StorageKeys {
         case skinTone(_ emoji: MCEmoji)
         case usageTimestamps(_ emoji: MCEmoji)
 
@@ -50,12 +50,12 @@ public struct MCEmoji: Codable {
     }
     /// The current skin tone for this emoji, if one has been selected.
     public var skinTone: MCEmojiSkinTone? {
-        let skinToneRawValue = UserDefaults.standard.integer(forKey: StorageKeys.skinTone(self).key)
+        let skinToneRawValue = MCEmojiStorage.defaults.integer(forKey: StorageKeys.skinTone(self).key)
         return MCEmojiSkinTone(rawValue: skinToneRawValue)
     }
     /// All times when the emoji has been selected.
     public var usage: [TimeInterval] {
-        (UserDefaults.standard.array(forKey: StorageKeys.usageTimestamps(self).key) as? [TimeInterval]) ?? []
+        (MCEmojiStorage.defaults.array(forKey: StorageKeys.usageTimestamps(self).key) as? [TimeInterval]) ?? []
     }
     /// The number of times this emoji has been selected.
     public var usageCount: Int {
@@ -125,7 +125,7 @@ public struct MCEmoji: Codable {
     /// - Parameters:
     ///   - skinToneRawValue: The raw value of the `MCEmojiSkinTone`.
     public func set(skinToneRawValue: Int) {
-        UserDefaults.standard.set(skinToneRawValue, forKey: StorageKeys.skinTone(self).key)
+        MCEmojiStorage.defaults.set(skinToneRawValue, forKey: StorageKeys.skinTone(self).key)
     }
     
     /// Returns this emoji fixed to the target skin tone.
@@ -145,7 +145,7 @@ public struct MCEmoji: Codable {
     /// Increments the usage count for this emoji.
     public func incrementUsageCount() {
         let nowTimestamp = Date().timeIntervalSince1970
-        UserDefaults.standard.set([nowTimestamp] + usage, forKey: StorageKeys.usageTimestamps(self).key)
+        MCEmojiStorage.defaults.set([nowTimestamp] + usage, forKey: StorageKeys.usageTimestamps(self).key)
     }
     
     // MARK: - Private Methods

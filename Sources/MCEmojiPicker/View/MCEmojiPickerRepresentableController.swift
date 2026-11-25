@@ -64,6 +64,12 @@ public struct MCEmojiPickerRepresentableController: UIViewControllerRepresentabl
     /// The default value of this property is `true`.
     public var displaysSearchBar: Bool?
     
+    /// Where pickers keep each emoji's skin tone and usage, like an App Group's defaults to share them between apps.
+    /// It sets `MCEmojiPickerViewController.storage` before the picker is created.
+    ///
+    /// The default value of this property is `nil`, which leaves `MCEmojiPickerViewController.storage` as it is.
+    public var storage: UserDefaults?
+    
     /// Color for the selected emoji category.
     ///
     /// The default value of this property is `.systemBlue`.
@@ -85,7 +91,8 @@ public struct MCEmojiPickerRepresentableController: UIViewControllerRepresentabl
         isDismissAfterChoosing: Bool? = nil,
         selectedEmojiCategoryTintColor: UIColor? = nil,
         feedBackGeneratorStyle: UIImpactFeedbackGenerator.FeedbackStyle? = nil,
-        displaysSearchBar: Bool? = nil
+        displaysSearchBar: Bool? = nil,
+        storage: UserDefaults? = nil
     ) {
         self._isPresented = isPresented
         self._selectedEmoji = selectedEmoji
@@ -96,6 +103,7 @@ public struct MCEmojiPickerRepresentableController: UIViewControllerRepresentabl
         self.selectedEmojiCategoryTintColor = selectedEmojiCategoryTintColor
         self.feedBackGeneratorStyle = feedBackGeneratorStyle
         self.displaysSearchBar = displaysSearchBar
+        self.storage = storage
     }
     
     // MARK: - Public Methods
@@ -116,6 +124,7 @@ public struct MCEmojiPickerRepresentableController: UIViewControllerRepresentabl
         switch isPresented {
         case true:
             guard representableController.presentedViewController == nil else { return }
+            if let storage { MCEmojiPickerViewController.storage = storage }
             let emojiPicker = MCEmojiPickerViewController()
             emojiPicker.delegate = context.coordinator
             emojiPicker.sourceView = representableController.view
